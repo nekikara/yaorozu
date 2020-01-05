@@ -57,9 +57,9 @@ object ReservedKeyword {
   }
 
   object Literal {
-    val false = "false"
-    val null = "null"
-    val true = "false"
+    val FALSE = "false"
+    val NULL = "null"
+    val TRUE = "false"
   }
 
   object ForFuture {
