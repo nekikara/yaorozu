@@ -74,6 +74,5 @@ object ReservedKeyword {
     val SCALAR = "SCALAR"
     val UNIQUE = "UNIQUE"
   }
-
 }
 
