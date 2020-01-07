@@ -45,8 +45,8 @@ case class WaitingState() extends TokenState {
 case class ClauseState() extends TokenState {
   override def process(candidate: String, target: Char): (String, TokenState, Boolean) = {
     target match {
-      case toClause() => (candidate :+ target, this, false)
-      case toWaiting() => (candidate, WaitingState(), true)
+      case toClause(_) => (candidate :+ target, this, false)
+      case toWaiting(_) => (candidate, WaitingState(), true)
       case _ => (target.toString, WaitingState(), true)
     }
   }
@@ -59,7 +59,7 @@ case class ListState() extends TokenState {
 case class IntegerState() extends TokenState {
   override def process(candidate: String, target: Char): (String, TokenState, Boolean) = {
     target match {
-      case toInteger() => (candidate :+ target, this, false)
+      case toInteger(_) => (candidate :+ target, this, false)
       case _ => (candidate, WaitingState(), true)
     }
   }
