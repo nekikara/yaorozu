@@ -6,8 +6,6 @@ import scala.util.matching.Regex
 case class CypToken(value: String)
 
 object Tokenizer {
-  case class Token(value: String)
-
   def next(query: String): CypToken = {
     @tailrec
     def catchToken(candidate: String, target: Char, rest: String, st: TokenState): CypToken = {
