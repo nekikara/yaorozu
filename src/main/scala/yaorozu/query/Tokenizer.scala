@@ -26,7 +26,9 @@ sealed trait TokenState {
   val toClause: Regex = """([a-zA-Z])""".r
   val toList: Regex = """(\[)""".r
   val toInteger: Regex = """(\d)""".r
-  val toWaiting: Regex = """([\s|\S])""".r
+  val toWaiting: Regex = """(\s)""".r
+  val toComma: Regex = """(,)""".r
+  val toListEnd: Regex = """(])""".r
   def process(candidate: String, target: Char): (String, TokenState, Boolean)
 }
 case class WaitingState() extends TokenState {
@@ -53,7 +55,11 @@ case class ClauseState() extends TokenState {
 }
 case class ListState() extends TokenState {
   override def process(candidate: String, target: Char): (String, TokenState, Boolean) = {
-    ("", WaitingState(), false)
+    target match {
+      case toInteger(_) => (candidate :+ target, ListContinueState(), false)
+      case toWaiting(_) => (candidate, this, false)
+      case toListEnd(_) => (candidate :+ target, WaitingState(), true)
+    }
   }
 }
 case class IntegerState() extends TokenState {
@@ -64,4 +70,13 @@ case class IntegerState() extends TokenState {
     }
   }
 }
-
+case class ListContinueState() extends TokenState {
+  override def process(candidate: String, target: Char): (String, TokenState, Boolean) = {
+    target match {
+      case toComma(_) => (candidate :+ target, ListState(), false)
+      case toWaiting(_) => (candidate, this, false)
+      case toInteger(_) => (candidate :+ target, this, false)
+      case toListEnd(_) => (candidate :+ target, WaitingState(), true)
+    }
+  }
+}
