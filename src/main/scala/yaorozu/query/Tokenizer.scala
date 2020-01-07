@@ -1,6 +1,7 @@
 package yaorozu.query
 
 import scala.annotation.tailrec
+import scala.util.matching.Regex
 
 case class CypToken(value: String)
 
@@ -22,19 +23,19 @@ object Tokenizer {
 }
 
 sealed trait TokenState {
+  val toClause: Regex = """([a-zA-Z])""".r
+  val toList: Regex = """(\[)""".r
+  val toInteger: Regex = """(\d)""".r
+  val toWaiting: Regex = """([\s|\S])""".r
   def process(candidate: String, target: Char): (String, TokenState, Boolean)
 }
 case class WaitingState() extends TokenState {
   override def process(candidate: String, target: Char): (String, TokenState, Boolean) = {
-    val toClause = """([a-zA-Z])""".r
-    val toList = """(\[)""".r
-    val toInteger = """(\d)""".r
-    val toStay = """([\s|\S])""".r
     val nextState = target match {
       case toClause(_) => ClauseState()
       case toList(_) => ListState()
       case toInteger(_) => IntegerState()
-      case toStay(_) => this
+      case toWaiting(_) => this
       case _ => throw new RuntimeException("Can't find a next state")
     }
 
@@ -43,7 +44,11 @@ case class WaitingState() extends TokenState {
 }
 case class ClauseState() extends TokenState {
   override def process(candidate: String, target: Char): (String, TokenState, Boolean) = {
-    ("", ClauseState(), false)
+    target match {
+      case toClause() => (candidate :+ target, this, false)
+      case toWaiting() => (candidate, WaitingState(), true)
+      case _ => (target.toString, WaitingState(), true)
+    }
   }
 }
 case class ListState() extends TokenState {
@@ -53,7 +58,10 @@ case class ListState() extends TokenState {
 }
 case class IntegerState() extends TokenState {
   override def process(candidate: String, target: Char): (String, TokenState, Boolean) = {
-    ("", WaitingState(), false)
+    target match {
+      case toInteger() => (candidate :+ target, this, false)
+      case _ => (candidate, WaitingState(), true)
+    }
   }
 }
 
