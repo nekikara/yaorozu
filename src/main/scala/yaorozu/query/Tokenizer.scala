@@ -6,17 +6,19 @@ import scala.util.matching.Regex
 case class CypToken(value: String)
 
 object Tokenizer {
-  def next(query: String): CypToken = {
+  def next(query: String, index: Int): (CypToken, Int) = {
     @tailrec
-    def catchToken(candidate: String, target: Char, rest: String, st: TokenState): CypToken = {
+    def catchToken(candidate: String, targetIndex: Int, st: TokenState): (CypToken, Int) = {
+      val target = query(targetIndex)
+      val nextIndex = targetIndex + 1
       st.process(candidate, target) match {
-        case (t, _, true) => CypToken(t)
-        case (nextCandidate, nextState, _) => catchToken(nextCandidate, rest.head, rest.tail, nextState)
+        case (t, _, true) => (CypToken(t), nextIndex)
+        case (nextCandidate, nextState, _) => catchToken(nextCandidate, nextIndex, nextState)
         case _ => throw new RuntimeException("Can't catch a token")
       }
     }
 
-    catchToken("", query.head, query.tail, WaitingState())
+    catchToken("", index, WaitingState())
   }
 }
 
