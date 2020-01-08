@@ -9,7 +9,7 @@ class InterpreterSpec extends FunSuite with DiagrammedAssertions {
     assert(actual == expect)
   }
   test("Interpreter should return a Literal that is a List of Int") {
-    val actual = Interpreter.run("RETURN [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] AS list")
+    val actual = Interpreter.run("RETURN [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]")
     val expect = List(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     assert(actual == expect)
   }

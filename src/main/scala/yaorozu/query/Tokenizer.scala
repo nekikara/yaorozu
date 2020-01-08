@@ -9,12 +9,16 @@ object Tokenizer {
   def next(query: String, index: Int): (CypToken, Int) = {
     @tailrec
     def catchToken(candidate: String, targetIndex: Int, st: TokenState): (CypToken, Int) = {
-      val target = query(targetIndex)
-      val nextIndex = targetIndex + 1
-      st.process(candidate, target) match {
-        case (t, _, true) => (CypToken(t), nextIndex)
-        case (nextCandidate, nextState, _) => catchToken(nextCandidate, nextIndex, nextState)
-        case _ => throw new RuntimeException("Can't catch a token")
+      if (query.isDefinedAt(targetIndex)) {
+        val target = query(targetIndex)
+        val nextIndex = targetIndex + 1
+        st.process(candidate, target) match {
+          case (t, _, true) => (CypToken(t), nextIndex)
+          case (nextCandidate, nextState, _) => catchToken(nextCandidate, nextIndex, nextState)
+          case _ => throw new RuntimeException("Can't catch a token")
+        }
+      } else {
+        (CypToken(candidate), targetIndex)
       }
     }
 
