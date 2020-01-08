@@ -32,5 +32,47 @@ object ReservedKeyword {
     val DESCENDING = "DESCENDING"
     val ON = "ON"
   }
+
+  object Expression {
+    val ALL = "ALL"
+    val CASE = "CASE"
+    val ELSE = "ELSE"
+    val END = "END"
+    val THEN = "THEN"
+    val WHEN = "WHEN"
+  }
+
+  object Operator {
+    val AND = "AND"
+    val AS = "AS"
+    val CONTAINS = "CONTAINS"
+    val DISTINCT = "DISTINCT"
+    val ENDS = "ENDS"
+    val IN = "IN"
+    val IS = "IS"
+    val NOT = "NOT"
+    val OR = "OR"
+    val STARTS = "STARTS"
+    val XOR = "XOR"
+  }
+
+  object Literal {
+    val FALSE = "false"
+    val NULL = "null"
+    val TRUE = "false"
+  }
+
+  object ForFuture {
+    val ADD = "ADD"
+    val CONSTRAINT = "CONSTRAINT"
+    val DO = "DO"
+    val DROP = "DROP"
+    val FOR = "FOR"
+    val MANDATORY = "MANDATORY"
+    val OF = "OF"
+    val REQUIRE = "REQUIRE"
+    val SCALAR = "SCALAR"
+    val UNIQUE = "UNIQUE"
+  }
 }
 
