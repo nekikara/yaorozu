@@ -6,7 +6,7 @@ sealed trait TokenState {
   def event(c: Char): TokenState = this
   def endEvent(): EndState = EndState("")
 }
-case object Neutral extends TokenState {
+case class NeutralState() extends TokenState {
   override def event(c: Char): TokenState = c match {
     case ' ' => WhiteSpaceState(c.toString)
     case _ => WordState(c.toString)
@@ -25,7 +25,6 @@ case class WordState(candidate: String) extends TokenState {
   }
   override def endEvent(): EndState = EndState(candidate)
 }
-
 case class EndState(result: String) extends TokenState {
   override def endEvent(): EndState = this
 }
@@ -34,6 +33,8 @@ object TokenState {
   type TokenReadState[A] = State[TokenState, A]
 
   def readOne(c: Char): TokenReadState[String] = State[TokenState, String] {
-    case x: WhiteSpaceState => (x.event(c), "")
+    case n: NeutralState => (n.event(c), "")
+    case ws: WhiteSpaceState => (ws.event(c), "")
+    case w: WordState => (w.event(c), "")
   }
 }
