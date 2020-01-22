@@ -1,15 +1,16 @@
 package yaorozu.query.sql
 
 import org.scalatest._
-import cats.syntax.applicative._
-import TokenState.TokenReadState
 
 class TokenStateSpec extends FunSuite with DiagrammedAssertions {
-  test("xxx") {
-    val actual = List('c', 'c').foldLeft("".pure[TokenReadState]) { (acc, c) =>
-      acc.flatMap(_ => TokenState.readOne(c))
-    }
-    val expect = WordState("cc")
-    assert(actual.runS(NeutralState).value == expect)
+  test("NeutralState should return WordState after reading a letter") {
+    val actual = NeutralState.event('c')
+    val expect = (WordState("c"), None)
+    assert(actual == expect)
+  }
+  test("NeutralState should return WhiteStatte after reading a space") {
+    val actual = NeutralState.event(' ')
+    val expect = (WhiteSpaceState(" "), None)
+    assert(actual == expect)
   }
 }

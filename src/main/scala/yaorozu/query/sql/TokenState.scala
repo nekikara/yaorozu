@@ -1,36 +1,24 @@
 package yaorozu.query.sql
 
-import cats.data.State
-
 sealed trait TokenState {
-  type Result = (TokenState, String)
-  def event(c: Char): Result = (this, "")
+  type Result = (TokenState, Option[String])
+  def event(c: Char): Result = (this, None)
 }
 case object NeutralState extends TokenState {
   override def event(c: Char): Result = c match {
-    case ' ' => (WhiteSpaceState(c.toString), "")
-    case _ => (WordState(c.toString), "")
+    case ' ' => (WhiteSpaceState(c.toString), None)
+    case _ => (WordState(c.toString), None)
   }
 }
 case class WhiteSpaceState(candidate: String) extends TokenState {
   override def event(c: Char): Result = c match {
-    case ' ' => (WhiteSpaceState(candidate :+ c), "")
-    case _ => (WordState(c.toString), candidate)
+    case ' ' => (WhiteSpaceState(candidate :+ c), None)
+    case _ => (WordState(c.toString), Some(candidate))
   }
 }
 case class WordState(candidate: String) extends TokenState {
   override def event(c: Char): Result = c match {
-    case ' ' => (WhiteSpaceState(c.toString), candidate)
-    case _ => (WordState(candidate :+ c), "")
-  }
-}
-
-object TokenState {
-  type TokenReadState[A] = State[TokenState, A]
-
-  def readOne(c: Char): TokenReadState[String] = State[TokenState, String] {
-    case NeutralState => NeutralState.event(c)
-    case ws: WhiteSpaceState => ws.event(c)
-    case w: WordState => w.event(c)
+    case ' ' => (WhiteSpaceState(c.toString), Some(candidate))
+    case _ => (WordState(candidate :+ c), None)
   }
 }
