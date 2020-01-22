@@ -8,7 +8,7 @@ class TokenStateSpec extends FunSuite with DiagrammedAssertions {
     val expect = (WordState("c"), None)
     assert(actual == expect)
   }
-  test("NeutralState should return WhiteStatte after reading a space") {
+  test("NeutralState should return WhiteState after reading a space") {
     val actual = NeutralState.event(' ')
     val expect = (WhiteSpaceState(" "), None)
     assert(actual == expect)
