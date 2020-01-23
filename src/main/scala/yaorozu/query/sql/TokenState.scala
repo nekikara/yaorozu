@@ -15,7 +15,7 @@ case object NeutralState extends TokenState {
 case class WhiteSpaceState(candidate: String) extends TokenState {
   override def event(c: Char): Result = c match {
     case ' ' | '\n' => (WhiteSpaceState(candidate :+ c), None)
-    case _ => (WordState(c.toString), Some(candidate))
+    case _ => (WordState(c.toString), None)
   }
 
   override def flush(): Option[String] = Some(candidate)

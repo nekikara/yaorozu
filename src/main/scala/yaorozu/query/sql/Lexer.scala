@@ -10,7 +10,7 @@ case class Lexer(sql: String) {
   def listTokens(): List[String] = {
     var l = List.empty[String]
     var t = nextToken()
-    while (t.isDefined) {
+    while (t.isDefined && !isOver) {
       l = l :+ t.get
       t = nextToken()
     }
@@ -27,6 +27,9 @@ case class Lexer(sql: String) {
       state = s
       tokenResult = r
       increment()
+    }
+    if (isOver) {
+      tokenResult = state.flush()
     }
     tokenResult
   }
