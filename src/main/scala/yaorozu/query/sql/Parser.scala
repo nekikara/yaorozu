@@ -26,4 +26,3 @@ case class Parser(lexer: Lexer) {
   }
   def consume(): Unit = { lookahead = lexer.nextToken() }
 }
-
