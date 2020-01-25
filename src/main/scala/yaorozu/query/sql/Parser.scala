@@ -3,10 +3,10 @@ package yaorozu.query.sql
 case class Parser(lexer: Lexer) {
   private var lookahead: Option[String] = lexer.nextToken()
 
-  def readCreate() = {
+  def readCreate(): AST = {
     suit("CREATE")
     readDatabase()
-    println(s"${lookahead}")
+    CreateDataBaseNode(lookahead.get)
   }
   def readDatabase() = {
     suit("DATABASE")
