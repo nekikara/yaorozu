@@ -7,6 +7,12 @@ object DatabaseTable {
     databases = databases :+ db
   }
 
+  def addIfNotExists(db: Database): Unit = {
+    if (!list().exists(_.name == db.name)) {
+      add(db)
+    }
+  }
+
   def list(): List[Database] = databases
 }
 
