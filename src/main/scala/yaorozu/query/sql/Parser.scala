@@ -3,45 +3,57 @@ package yaorozu.query.sql
 case class Parser(lexer: Lexer) {
   private var lookahead: Option[String] = lexer.nextToken()
 
-  def parse(): AST = readCreate()
-
-  def readCreate(): AST = {
-    suit("CREATE") match {
-      case None => throw new RuntimeException(s"Expecting CREATE; Found ${lookahead.get}")
-      case _ => true
+  def parse(): AST = lookup() match {
+    case Some("CREATE") => readCreate() match {
+      case Left(error) => throw new RuntimeException(error)
+      case Right(ast) => ast
     }
-    readCreateSubCommand() match {
-      case None => throw new RuntimeException(s"Expecting DATABASE or SCHEMA; Found ${lookahead.get}")
-      case _ => true
-    }
-    val confirmationOption = readIfNotExists() match {
-      case Some(x) => x
-      case _ => false
-    }
-    val name = readWord()
-    CreateDataBaseNode(name, confirmationOption)
+    case _ => throw new RuntimeException("Can't found a first token")
   }
 
-  def readCreateSubCommand(): Option[Boolean] =
+  def readCreate(): Either[String, AST] = {
+    for {
+      _ <- readCreateSubCommand()
+      confirmationOption <- readIfNotExists()
+      name <- readWord()
+    } yield CreateDataBaseNode(name, confirmationOption)
+  }
+
+  def readCreateSubCommand(): Either[String, Boolean] =
     suit("DATABASE") match {
       case None => suit("SCHEMA") match {
-        case None => None
-        case Some(x) => Some(x)
+        case None => Left(s"Expecting DATABASE or SCHEMA; Found ${lookahead.get}")
+        case Some(x) => Right(x)
       }
-      case Some(x) => Some(x)
+      case Some(x) => Right(x)
     }
 
-  def readIfNotExists(): Option[Boolean] =
-    for {
+  def readIfNotExists(): Either[String, Boolean] = {
+    val option = for {
       i <- suit("IF")
       n <- suit("NOT")
       e <- suit("EXISTS")
     } yield i && n && e
+    option match {
+      case Some(true) => Right(true)
+      case _ => Right(true)
+    }
+  }
 
-  def readWord(): String = {
+  def readWord(): Either[String, String] = {
     lookahead match {
-      case None => throw new RuntimeException(s"Expecting some variables; Found None")
-      case Some(x) => x
+      case None => Left(s"Expecting some variables; Found None")
+      case Some(x) => Right(x)
+    }
+  }
+
+  def lookup(): Option[String] = {
+    lookahead match {
+      case Some(x)  => {
+        consume()
+        Some(x)
+      }
+      case _ => None
     }
   }
 

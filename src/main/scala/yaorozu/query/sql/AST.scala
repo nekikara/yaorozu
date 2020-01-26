@@ -1,6 +1,6 @@
 package yaorozu.query.sql
 
-import yaorozu.db.{Database, DatabaseTable}
+import yaorozu.db.{ Database, DatabaseTable }
 
 sealed trait AST {
   def execute(): Unit
