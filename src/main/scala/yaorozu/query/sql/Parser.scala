@@ -3,21 +3,29 @@ package yaorozu.query.sql
 case class Parser(lexer: Lexer) {
   private var lookahead: Option[String] = lexer.nextToken()
 
-  def parse(): AST = lookup() match {
-    case Some("CREATE") => readCreate() match {
-      case Left(error) => throw new RuntimeException(error)
+  def parse(): AST = {
+    val result = lookup() match {
+      case Some("CREATE") => readCreate()
+      case Some("USE") => readUse()
+      case _ => Left("Can't found a first token")
+    }
+    result match {
+      case Left(err) => throw new RuntimeException(err)
       case Right(ast) => ast
     }
-    case _ => throw new RuntimeException("Can't found a first token")
   }
 
-  def readCreate(): Either[String, AST] = {
+  def readCreate(): Either[String, AST] =
     for {
       _ <- readCreateSubCommand()
       confirmationOption <- readIfNotExists()
       name <- readWord()
     } yield CreateDataBaseNode(name, confirmationOption)
-  }
+
+  def readUse(): Either[String, AST] =
+    for {
+      name <- readWord()
+    } yield UseNode(name)
 
   def readCreateSubCommand(): Either[String, Boolean] =
     suit("DATABASE") match {

@@ -12,3 +12,6 @@ case class CreateDataBaseNode(name: String, existsCheck: Boolean = false) extend
     else
       DatabaseTable.add(Database(name))
 }
+case class UseNode(name: String) extends AST {
+  override def execute(): Unit = DatabaseTable.changeCurrent(name)
+}
