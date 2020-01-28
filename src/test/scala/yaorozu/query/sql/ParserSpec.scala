@@ -12,6 +12,8 @@ class ParserSpec extends FunSuite with DiagrammedAssertions {
     assert(DatabaseTable.list() == List(Database("test")))
   }
   test("Parser should not try to create an existed database with if-not-exits") {
+    DatabaseTable.clear()
+    DatabaseTable.add(Database("test"))
     assert(DatabaseTable.list() == List(Database("test")))
     val lexer = Lexer("CREATE SCHEMA IF not exists    \n test")
     val parser = Parser(lexer)
@@ -20,6 +22,8 @@ class ParserSpec extends FunSuite with DiagrammedAssertions {
     assert(DatabaseTable.list() == List(Database("test")))
   }
   test("Parser should create a new database if it does not exits") {
+    DatabaseTable.clear()
+    DatabaseTable.add(Database("test"))
     assert(DatabaseTable.list() == List(Database("test")))
     val lexer = Lexer("CREATE SCHEMA IF not exists    \n test2")
     val parser = Parser(lexer)

@@ -8,6 +8,10 @@ object DatabaseTable {
     databases = databases :+ db
   }
 
+  def clear(): Unit = {
+    databases = List.empty[Database]
+  }
+
   def addIfNotExists(db: Database): Unit = {
     if (!list().exists(_.name == db.name)) {
       add(db)
@@ -29,5 +33,6 @@ object DatabaseTable {
       }
     }
   }
+
 }
 

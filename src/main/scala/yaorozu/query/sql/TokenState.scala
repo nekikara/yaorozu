@@ -1,9 +1,9 @@
 package yaorozu.query.sql
 
 sealed trait TokenState {
-  type Result = (TokenState, Option[String])
+  type Result = (TokenState, Option[Token])
   def event(c: Char): Result = (this, None)
-  def flush(): Option[String] = None
+  def flush(): Option[Token] = None
 }
 case object NeutralState extends TokenState {
   override def event(c: Char): Result = c match {
@@ -17,17 +17,16 @@ case class WhiteSpaceState(candidate: String) extends TokenState {
     case ' ' | '\n' => (WhiteSpaceState(candidate :+ c), None)
     case _ => (WordState(c.toString), None)
   }
-
-  override def flush(): Option[String] = Some(candidate)
+  override def flush(): Option[Token] = Some(Token.mapWord(candidate))
 }
 case class WordState(candidate: String) extends TokenState {
   override def event(c: Char): Result = c match {
-    case ' ' => (WhiteSpaceState(c.toString), Some(candidate))
+    case ' ' => (WhiteSpaceState(c.toString), Some(Token.mapWord(candidate)))
     case _ => (WordState(candidate :+ c), None)
   }
-  override def flush(): Option[String] = Some(candidate)
+  override def flush(): Option[Token] = Some(Token.mapWord(candidate))
 }
 
 object TokenReader {
-  def readOne(c: Char, state: TokenState): (TokenState, Option[String]) = state.event(c)
+  def readOne(c: Char, state: TokenState): (TokenState, Option[Token]) = state.event(c)
 }

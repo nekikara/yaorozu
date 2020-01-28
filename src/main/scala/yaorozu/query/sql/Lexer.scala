@@ -7,8 +7,9 @@ case class Lexer(sql: String) {
   private def increment(): Unit = {i = i + 1}
 
   def char(): Char = sql(i)
-  def listTokens(): List[String] = {
-    var l = List.empty[String]
+
+  def listTokens(): List[Token] = {
+    var l = List.empty[Token]
     var t = nextToken()
     while (t.isDefined && !isOver) {
       l = l :+ t.get
@@ -20,8 +21,8 @@ case class Lexer(sql: String) {
     }
   }
 
-  def nextToken(): Option[String] = {
-    var tokenResult: Option[String] = None
+  def nextToken(): Option[Token] = {
+    var tokenResult: Option[Token] = None
     while (!(isOver || tokenResult.isDefined)) {
       val (s, r) = TokenReader.readOne(char(), state)
       state = s
