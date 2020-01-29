@@ -17,6 +17,7 @@ case class Parser(lexer: Lexer) {
 
   def readClause(token: Token): Either[String, AST] = token match {
     case Create => readCreate()
+    case Use => readUse()
     case End => readNope()
     case _ => Left("Nothing to read")
   }
@@ -29,6 +30,11 @@ case class Parser(lexer: Lexer) {
     } yield CreateDataBaseNode(word, confirmationOption)
 
   def readNope(): Either[String, AST] = Right(Nope())
+
+  def readUse(): Either[String, AST] =
+    for {
+      word <- readWord()
+    } yield UseNode(word)
 
   def readCreateSubCommand(): Either[String, Boolean] =
     lookup() match {

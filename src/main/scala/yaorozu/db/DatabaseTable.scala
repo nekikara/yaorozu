@@ -4,6 +4,8 @@ object DatabaseTable {
   private var databases: List[Database] = List.empty[Database]
   private var current: Option[Database] = None
 
+  def currentDatabase(): Option[Database] = current
+
   def add(db: Database): Unit = {
     databases = databases :+ db
   }

@@ -31,4 +31,13 @@ class ParserSpec extends FunSuite with DiagrammedAssertions {
     ast.execute()
     assert(DatabaseTable.list() == List(Database("test"), Database("test2")))
   }
+  test("Parser should set the current database by using USE clause") {
+    DatabaseTable.clear()
+    DatabaseTable.add(Database("test"))
+    val lexer = Lexer("use   test")
+    val parser = Parser(lexer)
+    val ast = parser.parse()
+    ast.execute()
+    assert(DatabaseTable.currentDatabase().contains(Database("test")))
+  }
 }
