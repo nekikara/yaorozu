@@ -19,6 +19,13 @@ case class WhiteSpaceState(candidate: String) extends TokenState {
   }
   override def flush(): Option[Token] = Some(Token.mapWord(candidate))
 }
+case class StartParenthesisState(candidate: String) extends TokenState {
+  override def event(c: Char): Result = c match {
+    case ' ' | '\n' => (WhiteSpaceState(candidate :+ c), None)
+    case _ => (WordState(c.toString), None)
+  }
+  override def flush(): Option[Token] = Some(Token.mapWord(candidate))
+}
 case class WordState(candidate: String) extends TokenState {
   override def event(c: Char): Result = c match {
     case ' ' => (WhiteSpaceState(c.toString), Some(Token.mapWord(candidate)))
