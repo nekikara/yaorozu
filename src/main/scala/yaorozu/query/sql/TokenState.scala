@@ -8,20 +8,34 @@ sealed trait TokenState {
 case object NeutralState extends TokenState {
   override def event(c: Char): Result = c match {
     case ' ' | '\n' => (WhiteSpaceState(c.toString), None)
+    case '(' => (L_ParenthesisState(c.toString), None)
+    case ')' => (R_ParenthesisState(c.toString), None)
     case _ => (WordState(c.toString), None)
   }
-
 }
 case class WhiteSpaceState(candidate: String) extends TokenState {
   override def event(c: Char): Result = c match {
     case ' ' | '\n' => (WhiteSpaceState(candidate :+ c), None)
+    case '(' => (L_ParenthesisState(c.toString), None)
+    case ')' => (R_ParenthesisState(c.toString), None)
     case _ => (WordState(c.toString), None)
   }
   override def flush(): Option[Token] = Some(Token.mapWord(candidate))
 }
-case class StartParenthesisState(candidate: String) extends TokenState {
+case class L_ParenthesisState(candidate: String) extends TokenState {
+  override def event(c: Char): Result = c match {
+    case ' ' | '\n' => (WhiteSpaceState(candidate :+ c), Some(Token.mapWord(candidate)))
+    case '(' => (L_ParenthesisState(c.toString), Some(Token.mapWord(candidate)))
+    case ')' => (R_ParenthesisState(c.toString), Some(Token.mapWord(candidate)))
+    case _ => (WordState(c.toString), Some(Token.mapWord(candidate)))
+  }
+  override def flush(): Option[Token] = Some(Token.mapWord(candidate))
+}
+case class R_ParenthesisState(candidate: String) extends TokenState {
   override def event(c: Char): Result = c match {
     case ' ' | '\n' => (WhiteSpaceState(candidate :+ c), None)
+    case '(' => (L_ParenthesisState(c.toString), Some(Token.mapWord(candidate)))
+    case ')' => (R_ParenthesisState(c.toString), Some(Token.mapWord(candidate)))
     case _ => (WordState(c.toString), None)
   }
   override def flush(): Option[Token] = Some(Token.mapWord(candidate))
@@ -29,6 +43,8 @@ case class StartParenthesisState(candidate: String) extends TokenState {
 case class WordState(candidate: String) extends TokenState {
   override def event(c: Char): Result = c match {
     case ' ' => (WhiteSpaceState(c.toString), Some(Token.mapWord(candidate)))
+    case '(' => (L_ParenthesisState(c.toString), Some(Token.mapWord(candidate)))
+    case ')' => (R_ParenthesisState(c.toString), Some(Token.mapWord(candidate)))
     case _ => (WordState(candidate :+ c), None)
   }
   override def flush(): Option[Token] = Some(Token.mapWord(candidate))

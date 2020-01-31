@@ -9,8 +9,8 @@ case object Use extends Token
 case object If extends Token
 case object Not extends Token
 case object Exists extends Token
-case object StartParenthesis extends Token
-case object EndParenthesis extends Token
+case object L_Parenthesis extends Token
+case object R_Parenthesis extends Token
 case class Word(name: String) extends Token
 case object End extends Token
 
@@ -23,8 +23,8 @@ object Token {
     "USE" -> Use,
     "IF" -> If,
     "NOT" -> Not,
-    "(" -> StartParenthesis,
-    ")" -> EndParenthesis,
+    "(" -> L_Parenthesis,
+    ")" -> R_Parenthesis,
     "EXISTS" -> Exists
   )
 

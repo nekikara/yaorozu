@@ -8,4 +8,9 @@ class LexerSpec extends FunSuite with DiagrammedAssertions {
     val expect = List(Create, Database, Word("test"))
     assert(lexer.listTokens() == expect)
   }
+  test("Lexer should return tokens of the create-table-statement which has one column") {
+    val lexer = Lexer("CREATE table test (id int)")
+    val expect = List(Create, Table, Word("test"), L_Parenthesis, Word("id"), Word("int"), R_Parenthesis)
+    assert(lexer.listTokens() == expect)
+  }
 }
