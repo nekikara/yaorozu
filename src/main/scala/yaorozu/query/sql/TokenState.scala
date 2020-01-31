@@ -36,7 +36,7 @@ case class R_ParenthesisState(candidate: String) extends TokenState {
     case ' ' | '\n' => (WhiteSpaceState(candidate :+ c), None)
     case '(' => (L_ParenthesisState(c.toString), Some(Token.mapWord(candidate)))
     case ')' => (R_ParenthesisState(c.toString), Some(Token.mapWord(candidate)))
-    case _ => (WordState(c.toString), None)
+    case _ => (WordState(c.toString), Some(Token.mapWord(candidate)))
   }
   override def flush(): Option[Token] = Some(Token.mapWord(candidate))
 }
@@ -48,6 +48,9 @@ case class WordState(candidate: String) extends TokenState {
     case _ => (WordState(candidate :+ c), None)
   }
   override def flush(): Option[Token] = Some(Token.mapWord(candidate))
+}
+case object EndState extends TokenState {
+  override def flush(): Option[Token] = Some(End)
 }
 
 object TokenReader {

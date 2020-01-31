@@ -11,28 +11,36 @@ case class Lexer(sql: String) {
   def listTokens(): List[Token] = {
     var l = List.empty[Token]
     var t = nextToken()
-    while (t.isDefined && !isOver) {
+    while (!t.contains(End)) {
       l = l :+ t.get
       t = nextToken()
     }
-    state.flush() match {
-      case None => l
-      case Some(last) => l :+ last
-    }
+    l
   }
 
   def nextToken(): Option[Token] = {
-    var tokenResult: Option[Token] = None
-    while (!(isOver || tokenResult.isDefined)) {
-      val (s, r) = TokenReader.readOne(char(), state)
-      state = s
-      tokenResult = r
-      increment()
+    state match {
+      case EndState => EndState.flush()
+      case _ if isOver => {
+        val x = state.flush()
+        state = EndState
+        x
+      }
+      case _ => {
+        var tokenResult: Option[Token] = None
+        while (!(tokenResult.isDefined || isOver)) {
+          val (s, r) = TokenReader.readOne(char(), state)
+          state = s
+          tokenResult = r
+          increment()
+        }
+        if (tokenResult.isDefined) {
+          tokenResult
+        } else {
+          nextToken()
+        }
+      }
     }
-    if (isOver) {
-      tokenResult = state.flush()
-    }
-    tokenResult
   }
 }
 

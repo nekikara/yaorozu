@@ -19,7 +19,7 @@ object Token {
     "CREATE" -> Create,
     "DATABASE" -> Database,
     "SCHEMA" -> Schema,
-    "Table" -> Table,
+    "TABLE" -> Table,
     "USE" -> Use,
     "IF" -> If,
     "NOT" -> Not,
