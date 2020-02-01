@@ -22,12 +22,7 @@ case class Parser(lexer: Lexer) {
     case _ => Left("Nothing to read")
   }
 
-  def readCreate(): Either[String, AST] =
-    for {
-      _ <- readCreateSubCommand()
-      confirmationOption <- readIfNotExists()
-      word <- readWord()
-    } yield CreateDataBaseNode(word, confirmationOption)
+  def readCreate(): Either[String, AST] = readCreateSubCommand()
 
   def readNope(): Either[String, AST] = Right(Nope())
 
@@ -36,10 +31,14 @@ case class Parser(lexer: Lexer) {
       word <- readWord()
     } yield UseNode(word)
 
-  def readCreateSubCommand(): Either[String, Boolean] =
+  def readCreateSubCommand(): Either[String, AST] =
     lookup() match {
-      case Some(Database) => Right(true)
-      case Some(Schema) => Right(true)
+      case Some(Database) | Some(Schema) =>
+        for {
+          confirmationOption <- readIfNotExists()
+          word <- readWord()
+        } yield CreateDataBaseNode(word, confirmationOption)
+      case Some(Table) => Right(Nope())
       case _ => Left(s"Expecting DATABASE or SCHEMA; Found ${lookahead.get}")
     }
 
