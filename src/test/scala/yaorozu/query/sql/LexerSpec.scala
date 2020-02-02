@@ -12,5 +12,6 @@ class LexerSpec extends FunSuite with DiagrammedAssertions {
     val lexer = Lexer("CREATE table test (id int)")
     val expect = List(Create, Table, Word("test"), L_Parenthesis, Word("id"), Word("int"), R_Parenthesis)
     assert(lexer.listTokens() == expect)
+    assert(lexer.nextToken() == End)
   }
 }
