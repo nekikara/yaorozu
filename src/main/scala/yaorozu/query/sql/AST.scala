@@ -1,7 +1,10 @@
 package yaorozu.query.sql
 
 sealed trait AST
-case class CreateDataBaseNode(word: Word, existsCheck: Boolean = false) extends AST
+case class CreateDatabaseNode(word: Word, existsCheck: Boolean = false) extends AST
+case class CreateTableNode(word: Word, columns: List[ColumnNode]) extends AST
+case class ColumnNode(word: Word, datatype: DataTypeNode) extends AST
+case class DataTypeNode(word: Word) extends AST
 case class UseNode(w: Word) extends AST
 case class Nope() extends AST
 
@@ -35,7 +38,7 @@ object Builder {
       case Right(x) =>
         for {
           w <- word(lexer)
-        } yield CreateDataBaseNode(w, existsCheck = x)
+        } yield CreateDatabaseNode(w, existsCheck = x)
       case Left(error) => Left(error)
     }
   }

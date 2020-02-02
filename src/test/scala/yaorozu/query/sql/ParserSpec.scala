@@ -8,7 +8,7 @@ class ParserSpec extends FunSuite with DiagrammedAssertions {
     val lexer = Lexer("CREATE DATABASE     \n test")
     val parser = Parser(lexer)
     val ast = parser.parse()
-    val expect = CreateDataBaseNode(Word("test"))
+    val expect = CreateDatabaseNode(Word("test"))
     assert(ast == expect)
   }
   test("Parser should not try to create an existed database with if-not-exits") {
@@ -18,7 +18,7 @@ class ParserSpec extends FunSuite with DiagrammedAssertions {
     val lexer = Lexer("CREATE SCHEMA IF not exists    \n test")
     val parser = Parser(lexer)
     val ast = parser.parse()
-    val expect = CreateDataBaseNode(Word("test"), existsCheck = true)
+    val expect = CreateDatabaseNode(Word("test"), existsCheck = true)
     assert(ast == expect)
   }
   test("Parser should create a new database if it does not exits") {
@@ -28,7 +28,7 @@ class ParserSpec extends FunSuite with DiagrammedAssertions {
     val lexer = Lexer("CREATE SCHEMA IF not exists    \n test2")
     val parser = Parser(lexer)
     val ast = parser.parse()
-    val expect = CreateDataBaseNode(Word("test2"), existsCheck = true)
+    val expect = CreateDatabaseNode(Word("test2"), existsCheck = true)
     assert(ast == expect)
   }
   test("Parser should set the current database by using USE clause") {
