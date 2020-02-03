@@ -22,7 +22,7 @@ object Builder {
     val token = lexer.nextToken()
     token match {
       case Database | Schema => database(lexer)
-      case Table => Right(Nope())
+      case Table => table(lexer)
       case _ => Left(s"Expecting DATABASE or SCHEMA; Found ${token}")
     }
   }
@@ -42,6 +42,12 @@ object Builder {
       case Left(error) => Left(error)
     }
   }
+
+  def table(lexer: Lexer): Either[String, AST] =
+    for {
+      w <- word(lexer)
+      columns <- columns(lexer)
+    } yield CreateTableNode(w, columns)
 
   def ifNotExists(lexer: Lexer): Either[String, Boolean] = {
     val ifT :: noT :: rest = lexer.nextNToken(3)
@@ -64,6 +70,27 @@ object Builder {
         anything
     }
   }
+
+  def columns(lexer: Lexer): Either[String, List[ColumnNode]] = {
+    val result = for {
+      _ <- suit(lexer.nextToken(), L_Parenthesis)
+      column <- column(lexer)
+      _ <- suit(lexer.nextToken(), R_Parenthesis)
+    } yield List(column)
+    result match {
+      case Some(c) => Right(c)
+      case None => Left("Expecting Columns")
+    }
+  }
+
+  def column(lexer: Lexer): Option[ColumnNode] =
+    for {
+      cName1 <- word(lexer)
+      cType1 <- word(lexer)
+    } yield {
+      val dType1 = DataTypeNode(cType1)
+      ColumnNode(cName1, dType1)
+    }
 
   def word(lexer: Lexer): Either[String, Word] = {
     val token = lexer.nextToken()
